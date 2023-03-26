@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.user.Mapper.BlogVoMapper">
+    <select id="selectBlogByPage" resultType="com.user.Vo.BlogVo">
+        select b.blog_id,
+               b.blog_title,
+               b.blog_date,
+               b.blog_content,
+               b.blog_cover,
+               b.blog_description,
+               b.user_id,
+               b.blog_show,
+               bd.blog_likes,
+               bd.blog_browse,
+               lb.label_id,
+               cb.category_id,
+               md.md_content
+        from blog b,category_blog cb,label_blog lb,blogdata bd,md md
+        where b.blog_id = cb.blog_id and b.blog_id = lb.blog_id and b.blog_id = bd.blog_id and b.blog_id = md.md_id
+</select>
+
+    <select id="selectBlogById" resultType="com.user.Vo.BlogVo">
+        select b.blog_id,
+               b.blog_title,
+               b.blog_date,
+               b.blog_content,
+               b.blog_cover,
+               b.blog_description,
+               b.user_id,
+               b.blog_show,
+               bd.blog_likes,
+               bd.blog_browse,
+               lb.label_id,
+               cb.category_id,
+               md.md_content
+        from blog b,category_blog cb,label_blog lb,blogdata bd,md md
+        <where>
+            b.blog_id = cb.blog_id
+            and b.blog_id = lb.blog_id
+            and b.blog_id = bd.blog_id
+            and b.blog_id = md.md_id
+            and b.blog_id = #{blog_id}
+        </where>
+    </select>
+
+    <select id="getBlogShow" resultType="com.user.Vo.BlogVo">
+        select b.blog_id,
+        b.blog_title,
+        b.blog_date,
+        b.blog_content,
+        b.blog_cover,
+        b.blog_description,
+        b.user_id,
+        b.blog_show,
+        bd.blog_likes,
+        bd.blog_browse,
+        lb.label_id,
+        cb.category_id,
+        md.md_content
+        from blog b,category_blog cb,label_blog lb,blogdata bd,md md
+        <where>
+            b.blog_id = cb.blog_id
+            and b.blog_id = lb.blog_id
+            and b.blog_id = bd.blog_id
+            and b.blog_id = md.md_id
+            and b.blog_show = true
+        </where>
+    </select>
+
+</mapper>

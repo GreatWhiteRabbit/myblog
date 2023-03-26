@@ -1,0 +1,29 @@
+server:
+  port: 8081
+spring:
+  mail:
+    host: smtp.qq.com
+    username: 1826311175@qq.com
+    password: trayguhtkhqhbgbg
+    
+  datasource:
+    password: 123456
+    username: root
+    url: jdbc:mysql://8.130.83.95:3306/blog
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    host: 8.130.83.95
+    password: 123456
+    port: 6379
+    lettuce:
+      pool:
+        max-active: 8
+        min-idle: 0
+        max-idle: 8
+        max-wait: 100ms
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: false
+
+  mapper-locations: classpath:/Mapper/*.xml
