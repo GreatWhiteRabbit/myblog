@@ -88,6 +88,7 @@ com\user\Service\BlogVoService.class
 com\user\Service\Impl\BlogDataServiceImpl.class
 com\user\Service\Impl\LinkServiceImpl.class
 com\user\Service\mdService.class
+com\user\Vo\PreAndNextBlog.class
 com\user\Service\Impl\mdServiceImpl.class
 com\user\Mapper\LabelMapper.class
 com\user\Vo\LinkVo.class

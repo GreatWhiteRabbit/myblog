@@ -119,6 +119,8 @@ public class BlogController {
            // 删除Redis中的label分类和category分类
            stringRedisTemplate.delete(Constant.labels);
            stringRedisTemplate.delete(Constant.categorys);
+           // 删除blogIdList中的数据
+           stringRedisTemplate.delete(Constant.blogIdList);
            return result.ok(blogId);
        } else {
            try {
@@ -376,8 +378,66 @@ public class BlogController {
         if(Boolean.TRUE.equals(stringRedisTemplate.hasKey(Constant.categorys))) {
             stringRedisTemplate.delete(Constant.categorys);
         }
+        // 删除blogIdList中的数据
+        stringRedisTemplate.delete(Constant.blogIdList);
         return result.ok(true);
     }
+
+    // 获取此博客的上一篇博客和下一篇博客
+    @GetMapping("preAndNextBlog")
+    public Result preAndNextBlog(@RequestParam long blog_id) {
+        // 首先从Redis中blogIdList
+        int size = stringRedisTemplate.opsForList().size(Constant.blogIdList).intValue();
+        PreAndNextBlog preAndNextBlog = new PreAndNextBlog();
+        if(size == 0) {
+            // Redis中不存在，从MySQL中查询
+            List<Long> allBlogId = blogService.getAllBlogId();
+            // 将数据存入到Redis中
+            List<String> stringList = new ArrayList<>();
+            int listSize = allBlogId.size();
+            for(int i = 0; i < listSize; i++) {
+                String json = allBlogId.get(i).toString();
+                stringList.add(json);
+                if (allBlogId.get(i) == blog_id) {
+                    // 获取当前ID的上一条ID
+                    int preIndex = (i - 1 + listSize) % listSize;
+                    preAndNextBlog.setPreBlogId(allBlogId.get(preIndex));
+                    // 获取当前ID的下一条ID
+                    int nextIndex = ( i + 1) % listSize;
+                    preAndNextBlog.setNextBlogId(allBlogId.get(nextIndex));
+                }
+            }
+            // 根据ID获取标题
+            preAndNextBlog.setPreTitle(blogService.getTitleById(preAndNextBlog.getPreBlogId()));
+            preAndNextBlog.setNextTitle(blogService.getTitleById(preAndNextBlog.getNextBlogId()));
+            // 将数据层存入到Redis中
+            stringRedisTemplate.opsForList().leftPushAll(Constant.blogIdList,stringList);
+            // 返回数据
+            return result.ok(preAndNextBlog);
+        }
+        else {
+            // 从Redis中获取数据
+            List<String> range = stringRedisTemplate.opsForList().range(Constant.blogIdList, 0, -1);
+            for(int i = 0; i < size; i++) {
+                if(blog_id == Long.parseLong(range.get(i))) {
+                    // 获取上一条数据
+                    int preIndex = (i - 1 + size) % size;
+                    preAndNextBlog.setPreBlogId(Long.parseLong(range.get(preIndex)));
+                    // 获取下一条数据
+                    int nextIndex =(i + 1) % size;
+                    preAndNextBlog.setNextBlogId(Long.parseLong(range.get(nextIndex)));
+                    break;
+                }
+            }
+            // 根据ID获取标题
+            preAndNextBlog.setPreTitle(blogService.getTitleById(preAndNextBlog.getPreBlogId()));
+            preAndNextBlog.setNextTitle(blogService.getTitleById(preAndNextBlog.getNextBlogId()));
+            return result.ok(preAndNextBlog);
+        }
+
+
+    }
+
 
     // 设置过期时间
     public void setExpireTime(String keyName,String expireKeyName) {
