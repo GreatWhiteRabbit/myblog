@@ -7,11 +7,15 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.user.Mapper.BlogMapper;
 import com.user.Service.BlogService;
 import com.user.Vo.BlogVo;
+import com.user.Vo.PreAndNextBlog;
 import com.user.entity.Blog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements BlogService {
@@ -65,6 +69,30 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         Page<Blog> blogPage = new Page<>(page,size);
         IPage<Blog> blogIPage = page(blogPage,blogQueryWrapper);
         return blogIPage;
+    }
+
+
+
+    @Override
+    public List<Long> getAllBlogId() {
+        QueryWrapper<Blog> blogQueryWrapper = new QueryWrapper<>();
+        blogQueryWrapper.orderBy(true,true,"blog_id");
+        blogQueryWrapper.select("blog_id");
+        List<Map<String, Object>> maps = listMaps(blogQueryWrapper);
+        List<Long> longList = new ArrayList<>();
+        for (Map<String, Object> map : maps) {
+            Long blog_id = Long.parseLong(map.get("blog_id").toString());
+            longList.add(blog_id);
+        }
+        return longList;
+    }
+
+    @Override
+    public String getTitleById(long blog_id) {
+        QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("blog_id",blog_id);
+        String blog_title = getOne(queryWrapper).getBlog_title();
+        return blog_title;
     }
 
 

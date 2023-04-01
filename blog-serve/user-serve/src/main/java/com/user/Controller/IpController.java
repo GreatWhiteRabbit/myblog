@@ -23,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Enumeration;
 import java.util.List;
 
 
@@ -42,6 +43,7 @@ public class IpController {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
 
     @GetMapping("/user")
     public void getInfo(HttpServletRequest request) throws IOException {

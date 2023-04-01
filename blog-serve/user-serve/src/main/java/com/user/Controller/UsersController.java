@@ -3,8 +3,10 @@ package com.user.Controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.user.Mapper.UsersMapper;
+import com.user.Service.SendEmailCodeIpService;
 import com.user.Service.UserInfoService;
 import com.user.Service.UsersService;
+import com.user.Utils.IPUtil;
 import com.user.Utils.Result;
 import com.user.Vo.Constant;
 import com.user.Vo.Email;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -38,6 +41,9 @@ public class UsersController {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private SendEmailCodeIpService sendEmailCodeIpService;
     private   Result result =new Result();
 
     // 管理员注册
@@ -45,6 +51,7 @@ public class UsersController {
    public Result addUser(@RequestBody User user) throws InterruptedException {
       Users users = new Users();
       UserInfo userInfo = new UserInfo();
+
       AtomicBoolean exit = new AtomicBoolean(false);
       Thread thread = new Thread(() -> {
           users.setUser_email(user.getUser_email());
@@ -93,12 +100,25 @@ public class UsersController {
 
   // 访客输入邮箱验证用户是否存在并且存储验证码
     @GetMapping("/sendEmail")
-    public Result sendEmail(@RequestParam String user_email) {
+    public Result sendEmail(@RequestParam String user_email, HttpServletRequest request) {
         // 首先验证邮箱是否存在于数据库中
         Users exist = usersService.isExist(user_email);
         if(exist != null) {
+            // 用户已存在，直接返回
             return result.ok(exist);
         } else {
+            // 首先记住操作用户IP地址，防止有人恶意消耗邮件资源
+            String ipAddr = IPUtil.getIpAddr(request);
+            // 根据条件判断是否禁用此IP
+            boolean b = sendEmailCodeIpService.banIp(ipAddr);
+            // 将记录插入数据库中
+            sendEmailCodeIpService.addInfo(user_email,ipAddr);
+            if(b) {
+                // 禁用IP
+                // 修改数据库表中的allowed字段
+                sendEmailCodeIpService.updateInfo(ipAddr,0);
+                return result.ok("false");
+            }
             // 通过邮箱发送验证码
             String testCode = sendCode(user_email);
             // 设置三分钟的邮件验证码过期时间
@@ -194,7 +214,7 @@ public class UsersController {
             mimeMessageHelper.setTo(email);
             mimeMessageHelper.setSubject(title);
             String text = "<p>验证码  " + testCode + " 180秒内有效</p>" + "<br/>" +
-            "<a href =\"https://db-rabbit.work\">大白兔的个人博客</a>";
+            "<a href =\"https://www.db-rabbit.work\">大白兔的个人博客</a>";
             mimeMessageHelper.setText(text,true);
             javaMailSender.send(message);
         } catch (MessagingException e) {

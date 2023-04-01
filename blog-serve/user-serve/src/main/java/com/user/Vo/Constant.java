@@ -56,4 +56,8 @@ public  class  Constant {
     public static final String project = "project"; // 随笔
 
     public static final String projectExpireTime = "projectExpireTime"; // 随笔过期时间
+
+    public static final String blogIdList = "blogIdList"; // 记录博客的ID
+
+    public static final String suggestion = "suggestion"; // 网站用户记录
 }
