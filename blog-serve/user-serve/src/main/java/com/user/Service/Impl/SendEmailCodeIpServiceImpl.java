@@ -82,7 +82,9 @@ public class SendEmailCodeIpServiceImpl extends ServiceImpl<SendEmailCodeIpMappe
     @Override
     public IPage<SendEmailCodeIp> getAll(int page, int size) {
         Page<SendEmailCodeIp> sendEmailCodeIpPage = new Page<>(page,size);
-        IPage<SendEmailCodeIp> sendEmailCodeIpIPage = page(sendEmailCodeIpPage);
+        QueryWrapper<SendEmailCodeIp> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderBy(true,false,"surf_time");
+        IPage<SendEmailCodeIp> sendEmailCodeIpIPage = page(sendEmailCodeIpPage,queryWrapper);
         return sendEmailCodeIpIPage;
     }
 }

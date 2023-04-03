@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.user.Service.EssayService;
 import com.user.Service.MyRedisService;
 import com.user.Utils.Result;
-import com.user.Vo.Constant;
+import com.user.Utils.Constant;
 import com.user.Vo.EssayVo;
 import com.user.entity.Essay;
 import org.springframework.beans.factory.annotation.Autowired;

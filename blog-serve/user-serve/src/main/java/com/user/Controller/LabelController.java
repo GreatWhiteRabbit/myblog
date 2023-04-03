@@ -7,7 +7,7 @@ import com.user.Utils.EntityChange;
 import com.user.Utils.Result;
 import com.user.Vo.BlogNoData;
 import com.user.Vo.BlogVo;
-import com.user.Vo.Constant;
+import com.user.Utils.Constant;
 import com.user.Vo.LabelListBlogs;
 import com.user.entity.BlogData;
 import com.user.entity.label;

@@ -1,7 +1,7 @@
 package com.user.Controller;
 
 import com.user.Utils.Result;
-import com.user.Vo.Constant;
+import com.user.Utils.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;

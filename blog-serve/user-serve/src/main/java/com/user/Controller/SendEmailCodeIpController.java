@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping("/email_code")
+    @RequestMapping("/email_code")
 @ResponseBody
 public class SendEmailCodeIpController {
     @Autowired

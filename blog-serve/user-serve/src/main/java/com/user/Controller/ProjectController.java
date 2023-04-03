@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.user.Service.MyRedisService;
 import com.user.Service.ProjectService;
 import com.user.Utils.Result;
-import com.user.Vo.Constant;
+import com.user.Utils.Constant;
 import com.user.entity.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;

@@ -33,7 +33,9 @@ public class SurfServiceImpl extends ServiceImpl<SurfMapper, Surf> implements Su
     public IPage<Surf> getBaseInfoByPage(int page, int size) {
 
         Page<Surf> surfPage = new Page<>(page,size);
-        IPage<Surf> surfIPage = page(surfPage);
+        QueryWrapper<Surf> surfQueryWrapper = new QueryWrapper<>();
+        surfQueryWrapper.orderBy(true,false,"surf_time");
+        IPage<Surf> surfIPage = page(surfPage,surfQueryWrapper);
         return surfIPage;
     }
 

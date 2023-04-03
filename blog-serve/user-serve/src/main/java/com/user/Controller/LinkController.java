@@ -7,7 +7,7 @@ import com.user.Service.LinkService;
 import com.user.Service.MyRedisService;
 import com.user.Utils.EntityChange;
 import com.user.Utils.Result;
-import com.user.Vo.Constant;
+import com.user.Utils.Constant;
 import com.user.Vo.LinkVo;
 import com.user.entity.Link;
 import org.springframework.beans.factory.annotation.Autowired;

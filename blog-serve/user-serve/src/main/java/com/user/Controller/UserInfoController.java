@@ -6,7 +6,7 @@ import com.user.Service.UserInfoService;
 import com.user.Service.UsersService;
 import com.user.Utils.Result;
 import com.user.Vo.AdminInfo;
-import com.user.Vo.Constant;
+import com.user.Utils.Constant;
 import com.user.Vo.User;
 import com.user.entity.UserInfo;
 import com.user.entity.Users;
