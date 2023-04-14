@@ -146,6 +146,14 @@ public class CategoryController {
     }
 
 
+    // 获取所有的category
+    @GetMapping("getAllCategory")
+    public  Result getAllCategory() {
+        List<Category> list = categoryService.list();
+        return result.ok(list);
+    }
+
+
 
     // 这个函数是getLabelList的内部调用方法，不需要将实体类转成object类，在本controller方法中还需要用到
     public List<CategoryListBlogs> getList() throws JsonProcessingException {

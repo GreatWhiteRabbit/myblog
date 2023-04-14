@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.user.Mapper.UserInfoMapper;
 import com.user.Service.UserInfoService;
 import com.user.Utils.Result;
+import com.user.Utils.TokenUtil;
 import com.user.entity.UserInfo;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +31,9 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
                 .eq("user_account",userInfo.getUser_account());
         UserInfo info = getOne(userInfoQueryWrapper);
         if(info != null) {
-            return result.ok(info.getUser_id());
+            TokenUtil tokenUtil = new TokenUtil();
+            String token = tokenUtil.creatToken(info.getUser_account(),info.getUser_password(), "1");
+            return result.ok(info.getUser_id() + "@" + token);
         } else {
             return result.fail("账号密码错误");
         }

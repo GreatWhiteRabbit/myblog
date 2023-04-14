@@ -117,6 +117,7 @@ public class ReplyController {
             // 从MySQL中获取全部满足条件的数据
             List<Reply> replyList = replyService.getListByBlogId(blog_id);
             int getSize = replyList.size(); // 得到获取replyList的长度
+            if(getSize == 0) return result.ok();
             if((page - 1) * size > getSize) {
                 return result.fail("已经没有数据了");
             }
@@ -151,6 +152,7 @@ public class ReplyController {
             ReplyListVo replyListVo = getRangeFromRedisList(Constant.blogReply + blog_id,
                     firstData, lastData, listSize);
 
+
             return result.ok(replyListVo);
         }
     }
@@ -167,6 +169,7 @@ public class ReplyController {
             // 获取replyList的长度，作为返回值之一
             int getSize = replyList.size();
             // 如果网络请求的数据长度范围超出了replyList的长度，返回错误信息
+            if(getSize == 0) return result.ok();
             if(getSize < (page - 1) * size) {
                 return result.fail("没有更多数据了");
             }
@@ -299,7 +302,7 @@ public class ReplyController {
                 }
                 stringRedisTemplate.opsForList().leftPushAll(Constant.replyMessage + replyed_id,stringList);
                 // 设置过期时间
-                setExpireTime(Constant.replyMessage + replyed_id,Constant.replyMessage);
+                setExpireTime(Constant.replyMessage + replyed_id,Constant.replyMessageExpireTime);
                 // 将数据返回
                 return  listByReplyedId;
             } else {
@@ -408,18 +411,21 @@ public class ReplyController {
 
     // 设置过期时间
     public void setExpireTime(String keyName,String expireKeyName) {
+
         // 首先查找过期时间
         String expire = stringRedisTemplate.opsForValue().get(expireKeyName);
         int expireTime; // 过期时间
         // 如果expire为空，从数据库中查找
         if(expire == null) {
             expireTime = myRedisService.getByKeyName(expireKeyName);
+            System.out.println(expireTime);
             // 将过期时间存放到Redis中
             stringRedisTemplate.opsForValue().set(expireKeyName, String.valueOf(expireTime));
         } else {
             // 将expire 转成int
             expireTime = Integer.parseInt(expire);
         }
+
         stringRedisTemplate.expire(keyName,expireTime,TimeUnit.DAYS);
     }
 }

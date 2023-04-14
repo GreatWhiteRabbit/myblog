@@ -44,17 +44,26 @@ public class RedisAnalyzeController {
         else lastIndex = listSize;
         for (int i = firstIndex; i < lastIndex; i++) {
             String s = list.get(i);
-            RedisAnalyze analyze = new RedisAnalyze();
-            DataType type = stringRedisTemplate.type(s);
-            Long expire = stringRedisTemplate.getExpire(s, TimeUnit.DAYS);
-            analyze.setType(type.name());
-            analyze.setKey(s);
-            analyze.setExpireTime(expire);
-            analyze.setValue(getValue(s,type));
+            RedisAnalyze analyze = getKeyInfo(s);
             redisAnalyzeList.add(analyze);
         }
         return result.ok(new RedisAnalyzePage(redisAnalyzeList,listSize));
     }
+
+    // 根据前缀获取
+    @GetMapping("prefix")
+    public Result getByPrefix(@RequestParam String prefix) {
+        Set<String> scan = scan(prefix);
+        ArrayList<String> strings = new ArrayList<>(scan);
+        List<RedisAnalyze> redisAnalyzeList = new ArrayList<>();
+        for (String s : strings) {
+            RedisAnalyze analyze = getKeyInfo(s);
+            redisAnalyzeList.add(analyze);
+        }
+        return result.ok(redisAnalyzeList);
+    }
+
+
 
     // 删除key
     @GetMapping("delete")
@@ -70,6 +79,19 @@ public class RedisAnalyzeController {
         Boolean expire = stringRedisTemplate.expire(key, expireTime, TimeUnit.DAYS);
 
         return result.ok(expire);
+    }
+
+    // 获取key的相关信息,内部方法使用
+    public RedisAnalyze getKeyInfo(String s) {
+        RedisAnalyze analyze = new RedisAnalyze();
+        DataType type = stringRedisTemplate.type(s);
+        Long expire = stringRedisTemplate.getExpire(s);
+        assert type != null;
+        analyze.setType(type.name());
+        analyze.setKey(s);
+        analyze.setExpireTime(expire);
+        analyze.setValue(getValue(s,type));
+        return analyze;
     }
 
     // 获取每个key中字符串的长度

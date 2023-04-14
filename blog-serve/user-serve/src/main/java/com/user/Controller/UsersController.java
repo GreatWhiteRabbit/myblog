@@ -153,7 +153,10 @@ public class UsersController {
         String user_email = users.getUser_email();
         Users userByEmail = usersService.getUserByEmail(user_email);
         if (userByEmail.getUser_status() == 3) {
-            if(users.getUser_name().equals("GreatWhiteRabbit")) {
+            QueryWrapper<UserInfo> userInfoQueryWrapper = new QueryWrapper<>();
+            userInfoQueryWrapper.eq("user_id",1);
+            String user_account = userInfoService.getOne(userInfoQueryWrapper).getUser_account();
+            if(users.getUser_name().equals(user_account)) {
                 return result.ok(userByEmail);
             } else {
                 return result.fail("用户不存在");

@@ -172,7 +172,7 @@ public class IpController {
     // 获取IP地址所在的地理位置
     public IPVO getAddress(String ip) throws IOException {
         RestTemplate restTemplate=new RestTemplate();
-        String key = "0bcd02c19249a37f35da029388100dd1";
+        String key = "0bd0c19249a37f35da09388100d1";
        String url = "https://restapi.amap.com/v3/ip?ip=" +
                ip +
                "&output=json&key=" +

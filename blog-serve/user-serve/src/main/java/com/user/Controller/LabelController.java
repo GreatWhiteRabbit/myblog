@@ -47,6 +47,14 @@ public class LabelController {
     @Autowired
     private ObjectMapper objectMapper;
 
+    // 获取所有的label
+    @GetMapping("getAllLabel")
+    public Result getAllLabel() {
+        List<label> list = labelService.list();
+        return result.ok(list);
+    }
+
+
     // 获取label的名称和对应的label名称下有哪些blog
     @GetMapping("/list")
     public Result getLabelList() throws JsonProcessingException {
