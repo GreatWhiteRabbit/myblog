@@ -3,8 +3,8 @@ server:
 spring:
   mail:
     host: smtp.qq.com
-    username: 1826311175@qq.com
-    password: trayguhtkhqhbgbg
+    username: *******@qq.com
+    password: *******
     
   datasource:
     password: 9999
