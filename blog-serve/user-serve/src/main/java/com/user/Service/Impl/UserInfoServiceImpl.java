@@ -32,7 +32,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         UserInfo info = getOne(userInfoQueryWrapper);
         if(info != null) {
             TokenUtil tokenUtil = new TokenUtil();
-            String token = tokenUtil.creatToken(info.getUser_account(),info.getUser_password(), "1");
+            String token = tokenUtil.creatToken(info.getUser_account(),info.getUser_password(), "3");
             return result.ok(info.getUser_id() + "@" + token);
         } else {
             return result.fail("账号密码错误");

@@ -62,4 +62,6 @@ public  class  Constant {
     public static final String suggestion = "suggestion"; // 网站用户记录
 
     public static final String updateInfo = "updateInfo"; // 网站更新记录
+
+    public static final String homeShowBlogListId = "homeShowBlogListId"; // 博客首页固定
 }

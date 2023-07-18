@@ -95,5 +95,18 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         return blog_title;
     }
 
+    public List<Integer> getBlogIdList() {
+        QueryWrapper<Blog> blogQueryWrapper = new QueryWrapper<>();
+        blogQueryWrapper.select("blog_id");
+        blogQueryWrapper.orderBy(true,false,"blog_date");
+        List<Map<String, Object>> maps = listMaps(blogQueryWrapper);
+        List<Integer> integerList = new ArrayList<>();
+        for (Map<String, Object> map : maps) {
+            int blog_id = Integer.parseInt(map.get("blog_id").toString());
+            integerList.add(blog_id);
+        }
+        return integerList;
+    }
+
 
 }

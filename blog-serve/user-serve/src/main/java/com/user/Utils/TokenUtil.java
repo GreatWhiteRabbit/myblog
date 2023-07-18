@@ -5,20 +5,19 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.data.redis.core.StringRedisTemplate;
+
 
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+
 
 
 // 生成token
 public class TokenUtil {
 
-    private static final String token_secret = "D1igsYeJvrwUOulR38fOSL";
+    private static final String token_secret = "D1VhccigsYeJKvrwUOulRu38fOSL";
 
     private static final long expire_time = 4 * 60 * 60 * 1000;
 
@@ -81,33 +80,41 @@ public class TokenUtil {
 
 
 
-    private static StringRedisTemplate stringRedisTemplate;
+   /* private static StringRedisTemplate stringRedisTemplate;
 
     public static void setApplicationContext(ApplicationContext applicationContext) {
         stringRedisTemplate = applicationContext.getBean(StringRedisTemplate.class);
-    }
+    }*/
+    private final RedisHelper redisHelper = new RedisHelper();
 
     // 将token插入到Redis中
     public  void insertToken_ToRedis(String tokenKey, String token) {
-        stringRedisTemplate.opsForValue().set(tokenKey,token);
+        // 为token设置30分钟的过期时间
+        redisHelper.setStringKey(tokenKey,token,30 * 60);
+        /*stringRedisTemplate.opsForValue().set(tokenKey,token);
         // 设置30分钟的过期时间
-        stringRedisTemplate.expire(tokenKey,30, TimeUnit.MINUTES);
+        stringRedisTemplate.expire(tokenKey,30, TimeUnit.MINUTES);*/
     }
 
     // 从Redis中查询token是否存在
     public  boolean existToken(String tokenKey) {
 
-        boolean exist = stringRedisTemplate.hasKey(tokenKey).booleanValue();
+        boolean exist = redisHelper.exist(tokenKey);
+
+        // boolean exist = stringRedisTemplate.hasKey(tokenKey).booleanValue();
 
         // 不存在，返回false
         if(!exist) {
             return false;
         }
         // 如果存在，查看剩余过期时间
-        int expire = stringRedisTemplate.getExpire(tokenKey, TimeUnit.MINUTES).intValue();
+        Long expireTime = redisHelper.getExpireTime(tokenKey);
+       // int expire = stringRedisTemplate.getExpire(tokenKey, TimeUnit.MINUTES).intValue();
+        int expire = expireTime.intValue();
         // 如果剩余过期时间少于5分钟，更新过期时间
         if(expire <= 5) {
-            stringRedisTemplate.expire(tokenKey,30,TimeUnit.MINUTES);
+            //stringRedisTemplate.expire(tokenKey,30,TimeUnit.MINUTES);
+            redisHelper.setExpire(tokenKey,30 * 60);
         }
         return true;
     }

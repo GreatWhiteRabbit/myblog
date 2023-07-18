@@ -32,7 +32,6 @@ public class RedisAnalyzeController {
     // 获取所有key
     @GetMapping("getAll")
     public Result getAll(@RequestParam int page, @RequestParam int size) {
-
         Set<String> scan = scan("");
         List<String> list = new ArrayList<>(scan);
         List<RedisAnalyze> redisAnalyzeList = new ArrayList<>();

@@ -1,17 +1,38 @@
 server:
   port: 8081
+  ssl:
+    key-store: classpath:mytomcat.jks
+    key-store-type: JKS
+    enabled: true
+    key-store-password: is9jp7sd
 spring:
   mail:
     host: smtp.qq.com
     username: 1826311175@qq.com
     password: trayguhtkhqhbgbg
-    
+    port: 465
+    protocol: smtp
+    default-encoding: utf-8
+    properties:
+        mail:
+          smtp:
+            auth: true
+            starttls:
+              enable: true
+              required: true
+            ssl:
+              enable: true
+            socketFactory:
+              port: 465
+              class: javax.net.ssl.SSLSocketFactory
   datasource:
-    password: 123456
+    password: '#DSL&2K*'
     username: root
+    #url: jdbc:mysql://localhost:3306/blog
     url: jdbc:mysql://8.130.83.95:3306/blog
     driver-class-name: com.mysql.cj.jdbc.Driver
   redis:
+    #host: localhost
     host: 8.130.83.95
     password: 123456
     port: 6379
@@ -25,5 +46,7 @@ spring:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false
-
   mapper-locations: classpath:/Mapper/*.xml
+
+
+

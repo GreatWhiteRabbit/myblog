@@ -102,6 +102,8 @@ public class BlogController {
            stringRedisTemplate.delete(Constant.categorys);
            // 删除blogIdList中的数据
            stringRedisTemplate.delete(Constant.blogIdList);
+           // 删除homeblogid中的数据
+           stringRedisTemplate.delete(Constant.homeShowBlogListId);
            return result.ok(blogId);
        } else {
            try {
@@ -120,7 +122,7 @@ public class BlogController {
 
     }
 
-    // 查询首页可以显示的文章
+  /*  // 查询首页可以显示的文章
     @GetMapping("home")
     public Result getHomeBlog(@RequestParam int page, @RequestParam int size) throws JsonProcessingException {
         List<BlogVo> blogShow = blogVoService.getBlogShow();
@@ -168,6 +170,81 @@ public class BlogController {
         blogVoPage.setBlogVoList(blogVoList);
         return result.ok(blogVoPage);
     }
+*/
+
+    // 查询首页可以显示的文章
+    @GetMapping("home")
+    public Result getHomeBlog(@RequestParam int page, @RequestParam int size) throws JsonProcessingException {
+
+        int getSize = stringRedisTemplate.opsForList().size(Constant.homeShowBlogListId).intValue();
+        List<BlogVo> blogVoList = new ArrayList<>();
+        BlogVoPage blogVoPage = new BlogVoPage();
+        if(getSize == 0) {
+            // 先从Redis中查找
+            List<BlogVo> blogShow = blogVoService.getBlogShow();
+            int listSize = blogShow.size();
+            blogVoPage.setTotal(listSize);
+            int first,last;
+            if((page - 1) * size > listSize) return result.ok();
+            first = (page - 1) * size;
+            if(page * size < listSize) last = page * size;
+            else last = listSize;
+            List<String> stringList = new ArrayList<>();
+            for(int i = 0; i < listSize; i++) {
+                BlogVo blogVo = blogShow.get(i);
+                // Redis中查找，
+                int label_id = blogVo.getLabel_id();
+                int category_id = blogVo.getCategory_id();
+                String label_name = labelService.getLabelById(label_id);
+                String category_name = categoryService.getCategoryById(category_id);
+                blogVo.setLabel_name(label_name);
+                blogVo.setCategory_name(category_name);
+
+                // 实体类转换并且将转换后的实体类存到Redis中
+                HomeShowBlogVo homeShowBlogVo = EntityChange.changeBlogVo_ToHomeShoBlogVo(blogVo);
+                // 获取data数据
+                if(i >= first && i < last) {
+                    String json2 = stringRedisTemplate.opsForValue().get(Constant.blogData + blogVo.getBlog_id());
+                    BlogData blogData = objectMapper.readValue(json2, BlogData.class);
+                    blogVo.setBlog_browse(blogData.getBlog_browse());
+                    blogVo.setBlog_likes(blogData.getBlog_likes());
+                    blogVoList.add(blogVo);
+                }
+                // 将数据存储到Redis中
+                stringList.add(objectMapper.writeValueAsString(homeShowBlogVo));
+            }
+            stringRedisTemplate.opsForList().leftPushAll(Constant.homeShowBlogListId,stringList);
+            blogVoPage.setBlogVoList(blogVoList);
+            return result.ok(blogVoPage);
+        }
+        else {
+            // 再从redis中查找
+            List<String> range = stringRedisTemplate.opsForList().range(Constant.homeShowBlogListId, 0, -1);
+            if(range == null) return result.ok();
+            int redisSize = range.size();
+            blogVoPage.setTotal(redisSize);
+            int first,last;
+            if((page - 1) * size > redisSize) return result.ok();
+            first = (page - 1) * size;
+            if(page * size < redisSize) last = page * size;
+            else last = redisSize;
+            for (int i = first; i < last; i++) {
+                HomeShowBlogVo homeShowBlogVo = objectMapper.readValue(range.get(i), HomeShowBlogVo.class);
+                BlogVo blogVo = EntityChange.changeHomeShowBlogVo_ToBlogVo(homeShowBlogVo);
+                String json2 = stringRedisTemplate.opsForValue().get(Constant.blogData + blogVo.getBlog_id());
+                BlogData blogData = objectMapper.readValue(json2, BlogData.class);
+                blogVo.setBlog_browse(blogData.getBlog_browse());
+                blogVo.setBlog_likes(blogData.getBlog_likes());
+                blogVoList.add(blogVo);
+            }
+            blogVoPage.setBlogVoList(blogVoList);
+            return result.ok(blogVoPage);
+        }
+
+    }
+
+
+
 
     // 修改文章信息
     @PutMapping
@@ -190,12 +267,14 @@ public class BlogController {
             // 删除Redis中的label和category
             stringRedisTemplate.delete(Constant.categorys);
             stringRedisTemplate.delete(Constant.labels);
+            stringRedisTemplate.delete(Constant.homeShowBlogListId);
             return result.ok();
         } else {
             return result.fail("修改失败");
         }
 
     }
+
 
 
 
@@ -208,6 +287,7 @@ public class BlogController {
         boolean update = blogService.update(null, updateWrapper);
         if(update) {
             stringRedisTemplate.delete(Constant.blog + blog_id);
+            stringRedisTemplate.delete(Constant.homeShowBlogListId);
             return result.ok();
         } else {
             return result.fail("修改失败");

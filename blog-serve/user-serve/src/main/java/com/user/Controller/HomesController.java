@@ -2,20 +2,21 @@ package com.user.Controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.user.Service.HomesService;
 import com.user.Service.MyRedisService;
+import com.user.Utils.RedisHelper;
 import com.user.Utils.Result;
 import com.user.Utils.Constant;
 import com.user.entity.Homes;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+
 
 @RequestMapping("home")
 @Controller
@@ -24,17 +25,14 @@ public class HomesController {
 
     @Autowired
     private HomesService homesService;
-
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @Autowired
     private MyRedisService myRedisService;
 
-    private Result result = new Result();
+    // 统一结果返回类
+    private final Result result = new Result();
+
+    // 自定义封装的Redis工具类
+    private final RedisHelper redisHelper = new RedisHelper();
 
     // 添加主页轮播
     @PostMapping
@@ -48,7 +46,7 @@ public class HomesController {
     public Result update(@PathVariable("id") int id, @PathVariable("home_show") int home_show) {
         boolean b = homesService.updateShow(id, home_show);
         // 删除Redis中的轮播信息
-        stringRedisTemplate.delete(Constant.homeImage);
+        redisHelper.delete(Constant.homeImage);
         return  result.ok(b);
     }
 
@@ -56,31 +54,19 @@ public class HomesController {
     @GetMapping("/get")
     public Result get() throws JsonProcessingException {
         // 首先从Redis中查找，如果Redis中不存在，再从MySQL中查找
-        int size = stringRedisTemplate.opsForList().size(Constant.homeImage).intValue();
+        int size =  redisHelper.getListSize(Constant.homeImage).intValue();
         if(size == 0) {
             // 从MySQL中查找
             List<Homes> homes = homesService.get();
-            int listSize = homes.size();
-            // 将实体类转成json字符串
-            List<String> stringList = new ArrayList<>();
-            for(int i = 0; i < listSize; i++) {
-                String string = objectMapper.writeValueAsString(homes.get(i));
-                stringList.add(string);
-            }
-            // 将json字符串存入到Redis中
-            stringRedisTemplate.opsForList().leftPushAll(Constant.homeImage,stringList);
+            // 将homes存入到Redis中
+            redisHelper.setLeftPushAllKey(Constant.homeImage,homes,-1);
             // 设置过期时间
             setExpireTime(Constant.homeImage,Constant.homeImageExpireTime);
             // 返回数据
             return result.ok(homes);
         } else {
-            List<String> range = stringRedisTemplate.opsForList().range(Constant.homeImage, 0, -1);
-            int rangeSize = range.size();
-            List<Homes> homesList = new ArrayList<>();
-            for(int i = 0; i < rangeSize; i++) {
-                Homes homes = objectMapper.readValue(range.get(i), Homes.class);
-                homesList.add(homes);
-            }
+            // 从Redis中获取数据
+            List<Homes> homesList = redisHelper.getListRange(Constant.homeImage,0,-1,Homes.class);
             return result.ok(homesList);
         }
 
@@ -94,19 +80,18 @@ public class HomesController {
     }
 
     // 设置过期时间
-    public void setExpireTime(String keyName,String expireKeyName) {
+    private void setExpireTime(String keyName,String expireKeyName) {
         // 首先查找过期时间
-        String expire = stringRedisTemplate.opsForValue().get(expireKeyName);
-        int expireTime; // 过期时间
-        // 如果expire为空，从数据库中查找
-        if(expire == null) {
+        Integer expireTime = redisHelper.getStringObject(expireKeyName, Integer.class);
+        if(expireTime == null) {
+            // 从MySQL中查找过期时间
             expireTime = myRedisService.getByKeyName(expireKeyName);
-            // 将过期时间存放到Redis中
-            stringRedisTemplate.opsForValue().set(expireKeyName, String.valueOf(expireTime));
-        } else {
-            // 将expire 转成int
-            expireTime = Integer.parseInt(expire);
+            // 将过期时间存到Redis中
+            redisHelper.setStringKey(expireKeyName,expireTime,-1);
         }
-        stringRedisTemplate.expire(keyName,expireTime, TimeUnit.DAYS);
+        // 为keyName设置过期时间
+        // 转换时间单位
+        int seconds = expireTime * 24 * 60 * 60;
+        redisHelper.setExpire(keyName,seconds);
     }
 }

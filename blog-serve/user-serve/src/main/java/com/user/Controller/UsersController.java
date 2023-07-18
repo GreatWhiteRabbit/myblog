@@ -223,21 +223,9 @@ public class UsersController {
             e.printStackTrace();
         }
 
-        /*SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setFrom(sender + "(大白兔)");
-        simpleMailMessage.setTo(email);
-
-       String context = "验证码 " + testCode + " " +
-                "博客网址" + "<a href=http://www.w3school.com.cn>W3School</a>";
-        simpleMailMessage.setText(context);
-
-        simpleMailMessage.setSubject(title);
-        try {
-            javaMailSender.send(simpleMailMessage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
-
         return testCode;
     }
+
+
+
 }

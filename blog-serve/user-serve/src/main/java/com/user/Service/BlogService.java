@@ -22,4 +22,6 @@ public interface BlogService extends IService<Blog> {
     List<Long> getAllBlogId();
 
     String getTitleById(long blog_id);
+
+    List<Integer> getBlogIdList();
 }

@@ -2,6 +2,7 @@ package com.user.Utils;
 
 import com.user.Vo.BlogNoData;
 import com.user.Vo.BlogVo;
+import com.user.Vo.HomeShowBlogVo;
 import com.user.Vo.LinkVo;
 import com.user.entity.DeleteReply;
 import com.user.entity.Link;
@@ -49,5 +50,32 @@ public class EntityChange {
         linkVo.setImgurl(link.getImgurl());
         linkVo.setId(link.getId());
         return linkVo;
+    }
+
+    public static HomeShowBlogVo changeBlogVo_ToHomeShoBlogVo(BlogVo blogVo) {
+        HomeShowBlogVo homeShowBlogVo = new HomeShowBlogVo();
+        homeShowBlogVo.setBlog_id(blogVo.getBlog_id());
+        homeShowBlogVo.setBlog_cover(blogVo.getBlog_cover());
+        homeShowBlogVo.setBlog_date(blogVo.getBlog_date());
+        homeShowBlogVo.setBlog_title(blogVo.getBlog_title());
+        homeShowBlogVo.setBlog_description(blogVo.getBlog_description());
+        homeShowBlogVo.setCategory_name(blogVo.getCategory_name());
+        homeShowBlogVo.setLabel_name(blogVo.getLabel_name());
+
+        return homeShowBlogVo;
+    }
+
+    public static BlogVo changeHomeShowBlogVo_ToBlogVo(HomeShowBlogVo homeShowBlogVo) {
+        BlogVo blogVo = new BlogVo();
+        blogVo.setBlog_id(homeShowBlogVo.getBlog_id());
+        blogVo.setBlog_cover(homeShowBlogVo.getBlog_cover());
+        blogVo.setBlog_title(homeShowBlogVo.getBlog_title());
+        blogVo.setBlog_description(homeShowBlogVo.getBlog_description());
+        blogVo.setLabel_name(homeShowBlogVo.getLabel_name());
+        blogVo.setBlog_date(homeShowBlogVo.getBlog_date());
+        blogVo.setCategory_name(homeShowBlogVo.getCategory_name());
+
+        return blogVo;
+
     }
 }

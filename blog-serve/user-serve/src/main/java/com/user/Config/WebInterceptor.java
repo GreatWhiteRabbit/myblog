@@ -17,6 +17,11 @@ public class WebInterceptor implements HandlerInterceptor {
         StringBuffer requestURL = request.getRequestURL();
         String URL = requestURL.toString();
         int port = request.getServerPort();
+        if(port == 8081) {
+            MyInfoLog.LogOut("请求的地址===端口错误  " + URL, false);
+            // 拒绝访问
+            return setStatusCode(response,403);
+        }
         // 没有携带请求头的或者请求头错误的不予访问
         String WebAnalyze = request.getHeader("WebAnalyze");
         if (WebAnalyze == null || !WebAnalyze.equals("db-rabbit-home-blog")) {

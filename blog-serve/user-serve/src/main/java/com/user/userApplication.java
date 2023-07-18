@@ -1,5 +1,6 @@
 package com.user;
 
+import com.user.Utils.RedisHelper;
 import com.user.Utils.TokenUtil;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,7 +12,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class userApplication {
     public static void main(String[] args) {
          ApplicationContext application = SpringApplication.run(userApplication.class, args);
-            TokenUtil.setApplicationContext(application);
+           // TokenUtil.setApplicationContext(application);
+            RedisHelper.setApplicationContext(application);
     }
 
 }
