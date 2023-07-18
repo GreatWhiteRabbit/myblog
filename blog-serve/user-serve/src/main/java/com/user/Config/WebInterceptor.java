@@ -17,23 +17,22 @@ public class WebInterceptor implements HandlerInterceptor {
         StringBuffer requestURL = request.getRequestURL();
         String URL = requestURL.toString();
         int port = request.getServerPort();
-        if(port == 8081) {
+        if(port == 80) {
             MyInfoLog.LogOut("请求的地址===端口错误  " + URL, false);
             // 拒绝访问
             return setStatusCode(response,403);
         }
         // 没有携带请求头的或者请求头错误的不予访问
-        String WebAnalyze = request.getHeader("WebAnalyze");
-        if (WebAnalyze == null || !WebAnalyze.equals("db-rabbit-home-blog")) {
+        String WebAnalyze = request.getHeader("Wenlyze");
+        if (WebAnalyze == null || !WebAnalyze.equals("db-rabbit")) {
             MyInfoLog.LogOut("请求的地址===请求头错误  " + URL, false);
             // 拒绝访问
             return setStatusCode(response,403);
         }
-        if(port == 8079) {
-                // 管理员界面端口
+        if(port == 81) {
                 TokenUtil tokenUtil = new TokenUtil();
                  // post、put、delete请求必须携带token才能继续放行
-                String token = request.getHeader("Authorization");
+                String token = request.getHeader("Author");
 
                 // 如果token不存在，不予放行
                 boolean exist = tokenUtil.verifyToken(token);
