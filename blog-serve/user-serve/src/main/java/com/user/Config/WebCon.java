@@ -11,16 +11,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 public class WebCon extends WebMvcConfigurationSupport {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/blog/static/img/**").
-                addResourceLocations("file:/home/nginx/nginx/image/");
+        registry.addResourceHandler("/blog/img/**").
+                addResourceLocations("file:/home/image/");
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new WebInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/image/uploadAvatar")
-                .excludePathPatterns("/blog/static/img/**")
+                .excludePathPatterns("/image")
+                .excludePathPatterns("/blog/**")
                 .excludePathPatterns("/users/**")
                 .excludePathPatterns("/userInfo/**");
     }
